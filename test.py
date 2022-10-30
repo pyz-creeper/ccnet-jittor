@@ -1,6 +1,7 @@
 import jittor
 from datasets.dataloaders import ADE20k
 from networks.resnet import Resnet101
+from networks.ccnet import CCHead
 
 
 def test_single_gpu(model):
@@ -18,6 +19,8 @@ def test_single_gpu(model):
 
 if __name__ == "__main__":
     model = Resnet101()
+    head = CCHead()
     x = jittor.random([10,3,512,683])
-    for i in model(x):
-        print(type(i))
+    x = model(x)
+    out = head(x)
+    print(out.shape)
