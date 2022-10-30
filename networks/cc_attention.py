@@ -2,6 +2,7 @@ import jittor as jt
 from jittor import nn
 
 def NEG_INF_DIAG(n: int):
+
     """Returns a diagonal matrix of size [n, n].
 
     The diagonal are all "-inf". This is for avoiding calculating the
@@ -40,8 +41,7 @@ class CrissCrossAttention(nn.Module):
         query = self.query_conv(x)
         key = self.key_conv(x)
         value = self.value_conv(x)
-        energy_H = jt.linalg.einsum('bchw,bciw->bwhi', query, key) + NEG_INF_DIAG(
-            H)
+        energy_H = jt.linalg.einsum('bchw,bciw->bwhi', query, key) + NEG_INF_DIAG(H)
         energy_H = energy_H.transpose(1, 2)
         energy_W = jt.linalg.einsum('bchw,bchj->bhwj', query, key)
         attn = jt.nn.softmax(

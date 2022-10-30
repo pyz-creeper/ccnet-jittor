@@ -4,6 +4,7 @@ from networks.resnet import Resnet101
 from networks.ccnet import CCHead
 
 
+
 def test_single_gpu(model):
     # TODO inference each result on model (result in what form?)
     # TODO reshape the result so that it has the same shape with ann
