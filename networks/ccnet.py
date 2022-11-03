@@ -2,10 +2,11 @@ import jittor as jt
 from jittor import nn
 from .util_module import ConvModule, Dropout2d
 from .cc_attention import CrissCrossAttention
+from .resnet import Resnet101
 
 
 class CCHead(nn.Module):
-    def __init__(self, in_index=3, recurrence=2, in_channels=2048, channels=512, dropout_rate=0.1, num_classes=150):
+    def __init__(self, in_index=-1, recurrence=2, in_channels=2048, channels=512, dropout_rate=0.1, num_classes=150):
         self.in_index = in_index
         self.channels = channels
         self.recurrence = recurrence
@@ -41,3 +42,27 @@ class CCHead(nn.Module):
         output = self.conv_cat(jt.concat([x, output], dim=1))
         output = self.cls_seg(output)
         return output
+
+# TODO implement the auxiliary head!
+# Not very necessary though
+
+class AuxHead(nn.Module):
+    def __init__(self) -> None:
+        pass
+
+    def execute(self):
+        pass
+
+class CCnet(nn.Module):
+    def __init__(self) -> None:
+        self.backbone = Resnet101(pretrained=True)
+        self.decoder = CCHead()
+        # self.aux_decoder = AuxHead()
+
+    def execute(self,x):
+        output_features = self.backbone(x)
+        output = self.decoder(output_features)
+        output = nn.resize(output,x.shape[2:],mode="bilinear")
+        return output, output_features[-2]
+        
+        
