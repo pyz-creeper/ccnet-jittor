@@ -116,8 +116,8 @@ class ResNet(nn.Module):
         self.layer2 = self._make_layer(block, 128, layers[1], stride=2, dilate=replace_stride_with_dilation[0])
         self.layer3 = self._make_layer(block, 256, layers[2], stride=2, dilate=replace_stride_with_dilation[1])
         self.layer4 = self._make_layer(block, 512, layers[3], stride=4, dilate=replace_stride_with_dilation[2])
-        self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
-        self.fc = nn.Linear((512 * block.expansion), num_classes)
+        # self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
+        # self.fc = nn.Linear((512 * block.expansion), num_classes)
 
     def _make_layer(self, block, planes, blocks, stride=1, dilate=False):
         norm_layer = self._norm_layer
@@ -142,9 +142,9 @@ class ResNet(nn.Module):
         x = self.maxpool(x)
         outs = []
         x = self.layer1(x)
-        outs.append(x)
+        # outs.append(x)
         x = self.layer2(x)
-        outs.append(x)
+        # outs.append(x)
         x = self.layer3(x)
         outs.append(x)
         x = self.layer4(x)
