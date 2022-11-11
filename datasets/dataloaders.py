@@ -53,12 +53,12 @@ class ADE20k(Dataset):
 
     def __getitem__(self, index):
         img_info = self.img_infos[index]
-        # img = cv2.resize(cv2.imread(img_info['img_dir']),[683,512])
-        # img = np.array(img.transpose(2,0,1)[::-1]).astype(np.float32)
+        img = cv2.resize(cv2.imread(img_info['img_dir']),[683,512])
+        img = np.array(img.transpose(2,0,1)[::-1]).astype(np.float32)
 
         # ann = cv2.resize(cv2.imread(img_info['ann_dir'],cv2.IMREAD_GRAYSCALE),[683,512])
         # ann = np.array(ann).astype(np.uint8)
-        img = np.array(Image.open(img_info['img_dir'])).astype(np.float32).transpose(2,0,1)
+        # img = np.array(Image.open(img_info['img_dir'])).astype(np.float32).transpose(2,0,1)
         img /= 255.0
         ann = np.array(Image.open(img_info['ann_dir']))
         

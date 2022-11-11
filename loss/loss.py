@@ -19,8 +19,8 @@ class CriterionDSN(nn.Module):
             # print(scale_pred.shape,target.shape)
             loss1 = self.criterion(scale_pred, target)
             
-            scale_pred = nn.interpolate(preds[1], size=(h, w), mode='bilinear', align_corners=True)
-            loss2 = self.criterion(scale_pred, target)
+            scale_pred2 = nn.interpolate(preds[1], size=(h, w), mode='bilinear', align_corners=True)
+            loss2 = self.criterion(scale_pred2, target)
             return loss1 + loss2*0.4
         else:
             scale_pred = nn.interpolate(preds[0], size=(h, w), mode='bilinear', align_corners=True)
