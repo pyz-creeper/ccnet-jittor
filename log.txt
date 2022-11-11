@@ -1,0 +1,80 @@
+[38;5;2m[i 1111 15:59:07.633868 08 compiler.py:955] Jittor(1.3.5.28) src: /home/xueshuxinxing-jz/installations/anaconda3/envs/jittor/lib/python3.7/site-packages/jittor[m
+[38;5;2m[i 1111 15:59:07.642691 08 compiler.py:956] g++ at /usr/bin/g++(7.5.0)[m
+[38;5;2m[i 1111 15:59:07.642862 08 compiler.py:957] cache_path: /home/xueshuxinxing-jz/.cache/jittor/jt1.3.5/g++7.5.0/py3.7.12/Linux-4.15.0-1x27/IntelRXeonRCPUxe1/default[m
+[38;5;2m[i 1111 15:59:07.652492 08 __init__.py:411] Found nvcc(11.2.152) at /usr/local/cuda/bin/nvcc.[m
+[38;5;2m[i 1111 15:59:07.767985 08 __init__.py:411] Found gdb(8.1.1) at /usr/bin/gdb.[m
+[38;5;2m[i 1111 15:59:07.778159 08 __init__.py:411] Found addr2line(2.30) at /usr/bin/addr2line.[m
+[38;5;2m[i 1111 15:59:08.051250 08 compiler.py:1010] cuda key:cu11.2.152_sm_52[m
+[38;5;2m[i 1111 15:59:08.390915 08 __init__.py:227] Total mem: 125.79GB, using 16 procs for compiling.[m
+[38;5;2m[i 1111 15:59:08.544092 08 jit_compiler.cc:28] Load cc_path: /usr/bin/g++[m
+[38;5;2m[i 1111 15:59:08.689801 08 init.cc:62] Found cuda archs: [52,][m
+[38;5;2m[i 1111 15:59:08.866505 08 __init__.py:411] Found mpicc(2.1.1) at /usr/bin/mpicc.[m
+[38;5;3m[w 1111 15:59:09.009354 08 compile_extern.py:200] CUDA related path found in LD_LIBRARY_PATH or PATH(['/opt/cudnn/lib64', '/usr/local/cuda/lib64', '/home/xueshuxinxing-jz/.vscode-server/bin/6261075646f055b99068d3688932416f2346dd3b/bin/remote-cli', '/home/xueshuxinxing-jz/installations/anaconda3/envs/jittor/bin', '/home/xueshuxinxing-jz/installations/anaconda3/condabin', '/usr/local/sbin', '/usr/local/bin', '/usr/sbin', '/usr/bin', '/sbin', '/bin', '/usr/games', '/usr/local/games', '/usr/local/cuda/bin', '/snap/bin']), This path may cause jittor found the wrong libs, please unset LD_LIBRARY_PATH and remove cuda lib path in Path. 
+Or you can let jittor install cuda for you: `python3.x -m jittor_utils.install_cuda`[m
+[38;5;2m[i 1111 15:59:10.549783 08 cuda_flags.cc:39] CUDA enabled.[m
+[38;5;3m[w 1111 15:59:12.212093 08 __init__.py:1449] load parameter fc.weight failed ...[m
+[38;5;3m[w 1111 15:59:12.212308 08 __init__.py:1449] load parameter fc.bias failed ...[m
+[38;5;3m[w 1111 15:59:12.219782 08 __init__.py:1468] load total 522 params, 2 failed[m
+[38;5;3m[w 1111 15:59:12.289617 08 nn.py:2189]  The `Parameter` interface isn't needed in Jittor, this interface
+does nothings and it is just used for compatible.
+    
+A Jittor Var is a Parameter
+when it is a member of Module, if you don't want a Jittor
+Var menber is treated as a Parameter, just name it startswith
+underscore `_`.
+    [m
+0it [00:00, ?it/s]1it [00:00,  7.70it/s][38;5;3m[w 1111 15:59:15.966129 08 cuda_device_allocator.cc:29] Unable to alloc cuda device memory, use unify memory instead. This may cause low performance.[m
+[38;5;2m[i 1111 15:59:15.966336 08 cuda_device_allocator.cc:31] 
+=== display_memory_info ===
+ total_cpu_ram: 125.8GB total_device_ram: 11.93GB
+ hold_vars: 1625 lived_vars: 19143 lived_ops: 22090
+ name: sfrl is_device: 1 used: 7.722GB(93.2%) unused: 575.2MB(6.78%) total: 8.284GB
+ name: sfrl is_device: 1 used: 171.5MB(88.8%) unused: 21.53MB(11.2%) total:   193MB
+ name: sfrl is_device: 0 used: 171.5MB(88.8%) unused: 21.53MB(11.2%) total:   193MB
+ name: sfrl is_device: 0 used: 1.923MB(96.2%) unused:  78.5KB(3.83%) total:     2MB
+ name: temp is_device: 0 used:     0 B(-nan%) unused:     0 B(-nan%) total:     0 B
+ name: temp is_device: 1 used:     0 B(0%) unused: 2.544GB(100%) total: 2.544GB
+ cpu&gpu: 11.21GB gpu: 11.02GB cpu:   195MB
+ free: cpu(21.17GB) gpu(536.2MB)
+===========================
+[m
+[38;5;3m[w 1111 15:59:16.186840 08 cuda_device_allocator.cc:29] Unable to alloc cuda device memory, use unify memory instead. This may cause low performance.[m
+[38;5;2m[i 1111 15:59:16.186958 08 cuda_device_allocator.cc:31] 
+=== display_memory_info ===
+ total_cpu_ram: 125.8GB total_device_ram: 11.93GB
+ hold_vars: 1625 lived_vars: 19143 lived_ops: 22090
+ name: sfrl is_device: 1 used: 7.722GB(95.5%) unused: 373.2MB(4.51%) total: 8.087GB
+ name: sfrl is_device: 1 used: 171.5MB(88.8%) unused: 21.53MB(11.2%) total:   193MB
+ name: sfrl is_device: 0 used: 171.5MB(88.8%) unused: 21.53MB(11.2%) total:   193MB
+ name: sfrl is_device: 0 used: 1.923MB(96.2%) unused:  78.5KB(3.83%) total:     2MB
+ name: temp is_device: 0 used:     0 B(-nan%) unused:     0 B(-nan%) total:     0 B
+ name: temp is_device: 1 used:     0 B(0%) unused: 2.544GB(100%) total: 2.544GB
+ cpu&gpu: 11.01GB gpu: 10.82GB cpu:   195MB
+ free: cpu(21.17GB) gpu(738.2MB)
+===========================
+[m
+1it [00:03,  3.89s/it]
+Traceback (most recent call last):
+  File "train.py", line 28, in <module>
+    train()
+  File "train.py", line 24, in train
+    optimizer.step(loss.sum())
+  File "/home/xueshuxinxing-jz/installations/anaconda3/envs/jittor/lib/python3.7/site-packages/jittor/optim.py", line 279, in step
+    self.pre_step(loss, retain_graph=False)
+  File "/home/xueshuxinxing-jz/installations/anaconda3/envs/jittor/lib/python3.7/site-packages/jittor/optim.py", line 194, in pre_step
+    self.backward(loss, retain_graph)
+  File "/home/xueshuxinxing-jz/installations/anaconda3/envs/jittor/lib/python3.7/site-packages/jittor/optim.py", line 144, in backward
+    jt.sync(params_has_grad)
+RuntimeError: [38;5;1m[f 1111 15:59:16.387654 08 executor.cc:666] 
+Execute fused operator(1583/2655) failed. 
+[JIT Source]: /home/xueshuxinxing-jz/.cache/jittor/jt1.3.5/g++7.5.0/py3.7.12/Linux-4.15.0-1x27/IntelRXeonRCPUxe1/default/cu11.2.152_sm_52/jit/__opkey0_array__T_float32__opkey1_array__T_float32__opkey2_array__T_int32__o_1__opkey3_arr___hash_352b23a3542dad69_op.cc 
+[OP TYPE]: fused_op:( array, array, array, array, index, broadcast_to, broadcast_to, broadcast_to, broadcast_to, binary.multiply, binary.multiply, unary.floor_int, unary.floor_int, binary.add, binary.add,)
+[Input]: 
+[Output]: int32[1,1024,512,683,], int32[1,1024,512,683,], int32[1,1024,512,683,], int32[1,1024,512,683,], int32[1,1024,512,683,], int32[1,1024,512,683,], 
+[Async Backtrace]: not found, please set env JT_SYNC=1, trace_py_var=3 
+[Reason]: [38;5;1m[f 1111 15:59:16.386638 08 helper_cuda.h:128] CUDA error at /home/xueshuxinxing-jz/installations/anaconda3/envs/jittor/lib/python3.7/site-packages/jittor/src/mem/allocator/cuda_device_allocator.cc:32  code=2( cudaErrorMemoryAllocation ) cudaMallocManaged(&ptr, size)[m[m
+**********
+Async error was detected. To locate the async backtrace and get better error report, please rerun your code with two enviroment variables set:
+>>> export JT_SYNC=1
+>>> export trace_py_var=3
+

@@ -1,7 +1,12 @@
+import os
+os.environ['CUDA_VISIBLE_DEVICES'] = '2,3'
+
 from networks.ccnet import CCnet
 from datasets.dataloaders import ADE20k
 from loss.loss import CriterionDSN
 import jittor as jt
+if jt.has_cuda:
+    jt.flags.use_cuda = 1 
 from jittor import nn
 from tqdm import tqdm
 
@@ -17,6 +22,7 @@ def train():
         loss = criterion([out,out_dsn],ann)
         # TODO implement power lr decay
         optimizer.step(loss.sum())
+        print(batch_idx)
 
 
 if __name__ == "__main__":
