@@ -1,4 +1,6 @@
 log.txt
+*.log
+*.pth
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -133,3 +135,7 @@ dmypy.json
 # image dataset
 *.png
 *.jpg
+
+# files
+/saves
+*.pth
