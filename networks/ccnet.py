@@ -63,6 +63,6 @@ class CCnet(nn.Module):
         output_features = self.backbone(x)
         output = self.decoder(output_features)
         output = nn.resize(output,x.shape[2:],mode="bilinear")
-        return output, output_features[-2]
+        return output
         
         

@@ -1,9 +1,10 @@
-import pickle
+import random
 import numpy as np
 from PIL import Image
 import cv2
 from jittor.dataset import Dataset
 import os
+from tqdm import tqdm
 
 # ADE20K 2016 dataset
 class ADE20k(Dataset):
@@ -15,10 +16,12 @@ class ADE20k(Dataset):
         self.data_root = data_root
         self.batch_size = batch_size
         self.shuffle = shuffle
+        self.shuffle_index = []
         self.is_train = train
         img_file_path = os.path.join(data_root,"sceneCategories.txt")
         self.img_infos = self.parse_category_file(img_file_path)
         self.pipeline = transform_pipeline
+        self.short_side_length = [300,375,450,525,600]
 
 
     def __len__(self):
@@ -49,26 +52,45 @@ class ADE20k(Dataset):
                     "img_dir":os.path.join(self.data_root,"images","validation",name+".jpg"),
                     "ann_dir":os.path.join(self.data_root,"annotations","validation",name+".png")
                 })
+        self.shuffle_index = np.arange(len(img_infos))
+        if self.shuffle:
+            np.random.shuffle(self.shuffle_index)
         return img_infos
 
     def __getitem__(self, index):
-        img_info = self.img_infos[index]
-        img = cv2.resize(cv2.imread(img_info['img_dir']),[683,512])
-        img = np.array(img.transpose(2,0,1)[::-1]).astype(np.float32)
+        img_info = self.img_infos[self.shuffle_index[index]]
+        ini_img = cv2.imread(img_info['img_dir'])
+        ini_ann = cv2.imread(img_info['ann_dir'],cv2.IMREAD_GRAYSCALE)
+        if self.is_train:
+            ini_h, ini_w = ini_ann.shape
+            # control cuda memory
+            for i in range(4,0,-1):
+                a = random.randint(0,i)
+                short_len = min(self.short_side_length[a],ini_h,ini_w)
+                if ini_w > ini_h: # ini_h => short_len
+                    new_shape = (int(ini_w*short_len/ini_h),short_len)
+                else:
+                    new_shape = (short_len,int(ini_h*short_len/ini_w))
+                if new_shape[0] * new_shape[1] < 350000:
+                    break
+            img = cv2.resize(ini_img,new_shape)
+            img = np.array(img.transpose(2,0,1)[::-1]).astype(np.float32)
+            img /= 255.0
+            ann = cv2.resize(ini_ann,new_shape,interpolation=cv2.INTER_NEAREST)
+            ann = np.array(ann).astype(np.uint8)
+            return img,ann
+        else:
+            img = np.array(ini_img.transpose(2,0,1)[::-1]).astype(np.float32)
+            img /= 255.0
+            return img,ini_ann
 
-        # ann = cv2.resize(cv2.imread(img_info['ann_dir'],cv2.IMREAD_GRAYSCALE),[683,512])
-        # ann = np.array(ann).astype(np.uint8)
-        # img = np.array(Image.open(img_info['img_dir'])).astype(np.float32).transpose(2,0,1)
-        img /= 255.0
-        ann = np.array(Image.open(img_info['ann_dir']))
-        
-        # TODO reshaped those img into 512 * 512 shape
-        # add shapes to attribute?
-        return img,ann
 
-    def evaluate(self, results):
-        '''
-        list of numpy result img given by the model
-        '''
-        pass
 
+if __name__ == "__main__":
+    dataset = ADE20k(1,"../ADEChallengeData2016",train=True)
+    max_h,max_w = 0,0
+    for index,(img,ann) in tqdm(enumerate(dataset)):
+        _,imh,imw = ann.shape
+        if max_h*max_w < imh*imw:
+            max_h,max_w = imh,imw
+    print(max_h,max_w)
