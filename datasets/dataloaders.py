@@ -10,7 +10,6 @@ from tqdm import tqdm
 class ADE20k(Dataset):
     # TODO batch_size default value
     # TODO data_root default value
-    # TODO ask lzy how to write a dataloader(just kidding)
     def __init__(self, batch_size, data_root, transform_pipeline = None,train=True , shuffle=False):
         super().__init__()
         self.data_root = data_root
@@ -61,28 +60,39 @@ class ADE20k(Dataset):
         img_info = self.img_infos[self.shuffle_index[index]]
         ini_img = cv2.imread(img_info['img_dir'])
         ini_ann = cv2.imread(img_info['ann_dir'],cv2.IMREAD_GRAYSCALE)
-        if self.is_train:
-            ini_h, ini_w = ini_ann.shape
+        # if self.is_train:
+            # ver 1 #
+            # ini_h, ini_w = ini_ann.shape
             # control cuda memory
-            for i in range(4,0,-1):
-                a = random.randint(0,i)
-                short_len = min(self.short_side_length[a],ini_h,ini_w)
-                if ini_w > ini_h: # ini_h => short_len
-                    new_shape = (int(ini_w*short_len/ini_h),short_len)
-                else:
-                    new_shape = (short_len,int(ini_h*short_len/ini_w))
-                if new_shape[0] * new_shape[1] < 350000:
-                    break
-            img = cv2.resize(ini_img,new_shape)
-            img = np.array(img.transpose(2,0,1)[::-1]).astype(np.float32)
-            img /= 255.0
-            ann = cv2.resize(ini_ann,new_shape,interpolation=cv2.INTER_NEAREST)
-            ann = np.array(ann).astype(np.uint8)
-            return img,ann
-        else:
-            img = np.array(ini_img.transpose(2,0,1)[::-1]).astype(np.float32)
-            img /= 255.0
-            return img,ini_ann
+            # for i in range(4,0,-1):
+            #     a = random.randint(0,i)
+            #     short_len = min(self.short_side_length[a],ini_h,ini_w)
+            #     if ini_w > ini_h: # ini_h => short_len
+            #         new_shape = (int(ini_w*short_len/ini_h),short_len)
+            #     else:
+            #         new_shape = (short_len,int(ini_h*short_len/ini_w))
+            #     if new_shape[0] * new_shape[1] < 300000:
+            #         break
+            # img = cv2.resize(ini_img,new_shape)
+            # img = np.array(img.transpose(2,0,1)[::-1]).astype(np.float32)
+            # img /= 255.0
+            # ann = cv2.resize(ini_ann,new_shape,interpolation=cv2.INTER_NEAREST)
+            # ann = np.array(ann).astype(np.int32)
+        # ver 2 #
+        #     img = np.array(cv2.resize(ini_img,(512,512))).transpose(2,0,1)[::-1]
+        #     img = (img.astype(np.float32)) / 255.0
+        #     ann = cv2.resize(ini_ann,(512,512),interpolation=cv2.INTER_NEAREST)
+        #     ann = np.array(ann).astype(np.int32)
+        #     return img,ann
+        # else:
+        #     img = np.array(ini_img.transpose(2,0,1)[::-1]).astype(np.float32)
+        #     img /= 255.0
+        #     return img,ini_ann
+        img = np.array(cv2.resize(ini_img,(512,512))).transpose(2,0,1)[::-1]
+        img = (img.astype(np.float32)) / 255.0
+        ann = cv2.resize(ini_ann,(512,512),interpolation=cv2.INTER_NEAREST)
+        ann = np.array(ann).astype(np.int32)
+        return img,ann
 
 
 
