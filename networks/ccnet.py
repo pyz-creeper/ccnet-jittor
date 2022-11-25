@@ -6,7 +6,7 @@ from .resnet import Resnet101
 
 
 class CCHead(nn.Module):
-    def __init__(self, in_index=-1, recurrence=2, in_channels=2048, channels=512, dropout_rate=0.1, num_classes=150):
+    def __init__(self, in_index=-1, recurrence=2, in_channels=2048, channels=512, dropout_rate=0.1, num_classes=151): # 150 classes and a background
         self.in_index = in_index
         self.channels = channels
         self.recurrence = recurrence
@@ -63,6 +63,6 @@ class CCnet(nn.Module):
         output_features = self.backbone(x)
         output = self.decoder(output_features)
         output = nn.resize(output,x.shape[2:],mode="bilinear")
-        return output
+        return output,output_features[-2]
         
         

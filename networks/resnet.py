@@ -146,7 +146,7 @@ class ResNet(nn.Module):
         x = self.layer2(x)
         # outs.append(x)
         x = self.layer3(x)
-        # outs.append(x)
+        outs.append(x)
         x = self.layer4(x)
         outs.append(x)
         return tuple(outs)
