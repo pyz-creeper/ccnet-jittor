@@ -2,6 +2,7 @@ log.txt
 *.log
 *.pth
 *.pkl
+tmp/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

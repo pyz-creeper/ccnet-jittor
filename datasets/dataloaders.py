@@ -5,12 +5,11 @@ import cv2
 from jittor.dataset import Dataset
 import os
 from tqdm import tqdm
+from .data_pipeline import Pipeline
 
 # ADE20K 2016 dataset
 class ADE20k(Dataset):
-    # TODO batch_size default value
-    # TODO data_root default value
-    def __init__(self, batch_size, data_root, transform_pipeline = None,train=True , shuffle=False):
+    def __init__(self, batch_size, data_root, transform_pipeline = Pipeline(),train=True , shuffle=False):
         super().__init__()
         self.data_root = data_root
         self.batch_size = batch_size
@@ -60,10 +59,10 @@ class ADE20k(Dataset):
         img_info = self.img_infos[self.shuffle_index[index]]
         ini_img = cv2.imread(img_info['img_dir'])
         ini_ann = cv2.imread(img_info['ann_dir'],cv2.IMREAD_GRAYSCALE)
-        # if self.is_train:
-            # ver 1 #
+        
+        if self.is_train:
+            # ver 1 control cuda memory #
             # ini_h, ini_w = ini_ann.shape
-            # control cuda memory
             # for i in range(4,0,-1):
             #     a = random.randint(0,i)
             #     short_len = min(self.short_side_length[a],ini_h,ini_w)
@@ -74,25 +73,35 @@ class ADE20k(Dataset):
             #     if new_shape[0] * new_shape[1] < 300000:
             #         break
             # img = cv2.resize(ini_img,new_shape)
+            # ann = cv2.resize(ini_ann,new_shape,interpolation=cv2.INTER_NEAREST)
+            # cv2.imwrite("./img.png",img)
+            # cv2.imwrite("./ann.png",ann)
             # img = np.array(img.transpose(2,0,1)[::-1]).astype(np.float32)
             # img /= 255.0
-            # ann = cv2.resize(ini_ann,new_shape,interpolation=cv2.INTER_NEAREST)
             # ann = np.array(ann).astype(np.int32)
-        # ver 2 #
-        #     img = np.array(cv2.resize(ini_img,(512,512))).transpose(2,0,1)[::-1]
-        #     img = (img.astype(np.float32)) / 255.0
-        #     ann = cv2.resize(ini_ann,(512,512),interpolation=cv2.INTER_NEAREST)
-        #     ann = np.array(ann).astype(np.int32)
-        #     return img,ann
-        # else:
-        #     img = np.array(ini_img.transpose(2,0,1)[::-1]).astype(np.float32)
-        #     img /= 255.0
-        #     return img,ini_ann
-        img = np.array(cv2.resize(ini_img,(512,512))).transpose(2,0,1)[::-1]
-        img = (img.astype(np.float32)) / 255.0
-        ann = cv2.resize(ini_ann,(512,512),interpolation=cv2.INTER_NEAREST)
-        ann = np.array(ann).astype(np.int32)
-        return img,ann
+        # ver 2, mmseg#
+            img, ann = self.pipeline(ini_img,ini_ann)
+            img = np.array(img).transpose(2,0,1)[::-1]
+            img = (img.astype(np.float32)) / 255.0
+            ann = np.array(ann).astype(np.int32)
+            return img,ann
+        else:
+            if self.pipeline is not None:
+                img, ann = self.pipeline(ini_img,ini_ann)
+                img = np.array(img.transpose(2,0,1)[::-1]).astype(np.float32)
+                img /= 255.0
+                return img,ann
+            else:
+                img = np.array(ini_img.transpose(2,0,1)[::-1]).astype(np.float32)
+                img /= 255.0
+                return img,ini_ann
+        
+        
+        # img = np.array(cv2.resize(ini_img,(512,512))).transpose(2,0,1)[::-1]
+        # img = (img.astype(np.float32)) / 255.0
+        # ann = cv2.resize(ini_ann,(512,512),interpolation=cv2.INTER_NEAREST)
+        # ann = np.array(ann).astype(np.int32)
+        # return img,ann
 
 
 
@@ -100,6 +109,7 @@ if __name__ == "__main__":
     dataset = ADE20k(1,"../ADEChallengeData2016",train=True)
     max_h,max_w = 0,0
     for index,(img,ann) in tqdm(enumerate(dataset)):
+        exit(1)
         _,imh,imw = ann.shape
         if max_h*max_w < imh*imw:
             max_h,max_w = imh,imw
