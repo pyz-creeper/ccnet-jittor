@@ -56,14 +56,12 @@ def test_single_gpu(model,class_num=151):
         pos = confusion_matrix.sum(1)
         res = confusion_matrix.sum(0)
         tp = np.diag(confusion_matrix)
-        for i in range(len(pos)):
-            try:
-                print("class %s, IoU res %f"%{CLASSES[i],pos[i]})
-            except:
-                continue
         IU_array = (tp / np.maximum(1.0, pos + res - tp))
         mean_IU = IU_array.mean()
         print("mean_IoU:",mean_IU)
+
+def get_val_set_loss(model,class_num=151):
+    pass
 
 
 # if __name__ == "__main__":
