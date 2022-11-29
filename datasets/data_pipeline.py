@@ -134,6 +134,14 @@ class Resize():
         scale = self._random_scale(img,ann)
         return cv2.resize(img,scale), cv2.resize(ann,scale,interpolation=cv2.INTER_NEAREST)
 
+class NotRandomResize():
+    def __init__(self,resize_size=(512,512)) -> None:
+        self.resize_size = resize_size
+        
+    def __call__(self,img,ann):
+        img = cv2.resize(img,(512,512))
+        ann = cv2.resize(ann,(512,512),cv2.INTER_NEAREST)
+        return img,ann
 
 class RandomCrop():
     def __init__(self, crop_size, cat_max_ratio=1., ignore_index=255):
@@ -230,11 +238,14 @@ class Pad():
 
 class Pipeline:
     def __init__(self) -> None:
-        self.transforms = [Resize(img_scale=(1024,512),ratio_range=(0.5,1.5))
-                           ,RandomCrop(crop_size=(512,512),cat_max_ratio=0.8)
-                           ,RandomFlip(prob=0.5)
-                        #    ,Normalize(mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375])
-                            ,Pad(size=(512,512))]
+        self.transforms = [
+            NotRandomResize((512,512))
+            #Resize(img_scale=(1024,512),ratio_range=(0.5,1.5))
+            #,RandomCrop(crop_size=(512,512),cat_max_ratio=0.8)
+            ,RandomFlip(prob=0.5)
+            #,Normalize(mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375])
+            #,Pad(size=(512,512))
+            ]
         
     def __call__(self,img, ann):
         for transform in self.transforms:

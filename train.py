@@ -15,7 +15,7 @@ from tensorboardX import SummaryWriter
 
 # TODO: change this to a argparser format
 learning_rate = 2e-3
-batch_size = 1
+batch_size = 2
 global_step = 160000 // batch_size
 eval_gap = 8000 // batch_size
 save_every = 8000 // batch_size
@@ -26,14 +26,14 @@ def train():
     dataset = ADE20k(batch_size,"./ADEChallengeData2016",train=True,shuffle=True)
     criterion = CriterionDSN()
     optimizer = nn.SGD(model.parameters(),learning_rate,0.9,0.0005)
-    writer = SummaryWriter("./saves/1125_train")
+    writer = SummaryWriter("./saves/1127_train")
     step = 0
     num_epoches = global_step // len(dataset) + 1
     for epoch in range(num_epoches):
         for batch_idx, (img, ann) in tqdm(enumerate(dataset)):
-            out,out_dsn = model(img)
-            loss = criterion([out,out_dsn],ann)
-            optimizer.lr = learning_rate * ((1-step/global_step)**0.9)
+            out,_ = model(img)
+            loss = criterion([out],ann)
+            optimizer.lr = learning_rate * (max((1-step/global_step),1e-4)**0.9)
             writer.add_scalar("loss",loss.numpy(),global_step=step)
             optimizer.step(loss)
             step += 1
@@ -43,7 +43,7 @@ def train():
                 test_single_gpu(model)
                 model.train()
             if step%save_every == 0:
-                model.save("./saves/1125_train/train_ccnet_resnet_epoch%d.pkl"%(step))
+                model.save("./saves/1127_train/train_ccnet_resnet_epoch%d.pkl"%(step))
             if step > global_step :
                 return
 
