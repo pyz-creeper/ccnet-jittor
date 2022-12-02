@@ -31,8 +31,8 @@ def train():
     num_epoches = global_step * batch_size // len(dataset) + 1
     for epoch in range(num_epoches):
         for batch_idx, (img, ann) in tqdm(enumerate(dataset)):
-            out,_ = model(img)
-            loss = criterion([out],ann)
+            out_m,out_aux = model(img)
+            loss = criterion([out_m,out_aux],ann)
             optimizer.lr = learning_rate * (max((1-step/global_step),1e-4)**0.9)
             writer.add_scalar("loss",loss.numpy(),global_step=step)
             optimizer.step(loss)
