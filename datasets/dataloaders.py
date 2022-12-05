@@ -9,7 +9,7 @@ from .data_pipeline import Pipeline
 
 # ADE20K 2016 dataset
 class ADE20k(Dataset):
-    def __init__(self, batch_size, data_root, transform_pipeline = Pipeline(),train=True , shuffle=False):
+    def __init__(self, batch_size, data_root, transform_pipeline=Pipeline(train=True), train=True, shuffle=False):
         super().__init__()
         self.data_root = data_root
         self.batch_size = batch_size
@@ -21,10 +21,9 @@ class ADE20k(Dataset):
         self.pipeline = transform_pipeline
         self.short_side_length = [300,375,450,525,600]
 
-
     def __len__(self):
         return len(self.img_infos)
-        
+
     def parse_category_file(self, img_file_path):
         """
         parse the image info from sceneCategories.txt given by the dataset
@@ -59,7 +58,7 @@ class ADE20k(Dataset):
         img_info = self.img_infos[self.shuffle_index[index]]
         ini_img = cv2.imread(img_info['img_dir'])
         ini_ann = cv2.imread(img_info['ann_dir'],cv2.IMREAD_GRAYSCALE)
-        
+
         if self.is_train:
             # ver 1 control cuda memory #
             # ini_h, ini_w = ini_ann.shape
@@ -80,23 +79,23 @@ class ADE20k(Dataset):
             # img /= 255.0
             # ann = np.array(ann).astype(np.int32)
         # ver 2, mmseg#
-            img, ann = self.pipeline(ini_img,ini_ann)
-            img = np.array(img).transpose(2,0,1)[::-1]
-            img = (img.astype(np.float32)) / 255.0
+            img, ann = self.pipeline(ini_img, ini_ann)
+            img = np.array(img.transpose(2,0,1)).astype(np.float32)
+            # img = (img.astype(np.float32)) / 255.0
             ann = np.array(ann).astype(np.int32)
             return img,ann
         else:
             if self.pipeline is not None:
                 img, ann = self.pipeline(ini_img,ini_ann)
-                img = np.array(img.transpose(2,0,1)[::-1]).astype(np.float32)
-                img /= 255.0
-                return img,ann
+                img = np.array(img.transpose(2,0,1)).astype(np.float32)
+                # img /= 255.0
+                return img, ann
             else:
                 img = np.array(ini_img.transpose(2,0,1)[::-1]).astype(np.float32)
                 img /= 255.0
-                return img,ini_ann
-        
-        
+                return img, ann
+
+
         # img = np.array(cv2.resize(ini_img,(512,512))).transpose(2,0,1)[::-1]
         # img = (img.astype(np.float32)) / 255.0
         # ann = cv2.resize(ini_ann,(512,512),interpolation=cv2.INTER_NEAREST)

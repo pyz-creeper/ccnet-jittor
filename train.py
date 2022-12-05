@@ -14,8 +14,8 @@ import time
 from tensorboardX import SummaryWriter
 
 # TODO: change this to a argparser format
-learning_rate = 2e-3
-batch_size = 8
+learning_rate = 1e-2
+batch_size = 16
 global_step = 80000
 eval_gap = 8000
 save_every = 8000
@@ -23,10 +23,10 @@ save_every = 8000
 def train():
     model = CCnet()
     model.train()
-    dataset = ADE20k(batch_size,"./ADEChallengeData2016",train=True,shuffle=True)
+    dataset = ADE20k(batch_size, "./ADEChallengeData2016", train=True, shuffle=True, )
     criterion = CriterionDSN()
     optimizer = nn.SGD(model.parameters(),learning_rate,0.9,0.0005)
-    writer = SummaryWriter("./saves/1130_raw")
+    writer = SummaryWriter("./saves/1205_aug_16")
     step = 0
     num_epoches = global_step * batch_size // len(dataset) + 1
     for epoch in range(num_epoches):
@@ -43,7 +43,7 @@ def train():
             #     test_single_gpu(model)
             #     model.train()
             if step%save_every == 0:
-                model.save("./saves/1130_raw/train_ccnet_resnet_epoch%d.pkl"%(step))
+                model.save("./saves/1205_aug_16/train_ccnet_resnet_epoch%d.pkl"%(step))
             if step > global_step :
                 return
 

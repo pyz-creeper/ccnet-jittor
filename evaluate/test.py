@@ -1,5 +1,6 @@
 import jittor as jt
 from datasets.dataloaders import ADE20k
+from datasets.data_pipeline import Pipeline
 import numpy as np
 from tqdm import tqdm
 
@@ -43,7 +44,7 @@ def get_confusion_matrix(gt_label, pred_label, class_num):
 
 def test_single_gpu(model,class_num=151):
     model.eval()
-    dataset = ADE20k(1,"./ADEChallengeData2016",train=False,transform_pipeline=None) # load val set!
+    dataset = ADE20k(1,"./ADEChallengeData2016",train=False, transform_pipeline=Pipeline(train=False)) # load val set!
     confusion_matrix = np.zeros((class_num,class_num))
     with jt.no_grad():
         for index, (img, ann) in tqdm(enumerate(dataset)):
