@@ -22,12 +22,12 @@ from tensorboardX import SummaryWriter
 def parse_opt():
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("--lr", type=float, default="2e-3", help="learning rate")
-    parser.add_argument("--batch_size", type=int, default=8, help="batch size")
+    parser.add_argument("--lr", type=float, default="1e-2", help="learning rate")
+    parser.add_argument("--batch_size", type=int, default=16, help="batch size")
     parser.add_argument("--iters", type=int, default=80000, help="total train iterations")
     parser.add_argument("--save_every", type=int, default=8000, help="save gap")
     parser.add_argument("--recurrence", type=int, default=2, help="cc attention recurrence")
-    parser.add_argument("--log_dir", type=str, default="./saves/1208_dilated", help="log directory")
+    parser.add_argument("--log_dir", type=str, default="./saves/1208_final_16", help="log directory")
     parser.add_argument("--attention_block", type=str, default='vanilla',
                         choices=['vanilla', 'neighborhood', 'dilated'], help="attention block type")
 
@@ -38,7 +38,7 @@ def parse_opt():
 def train(opt):
     model = CCnet(opt.attention_block, opt.recurrence)
     model.train()
-    dataset = ADE20k(opt.batch_size, "./ADEChallengeData2016", train=True, shuffle=True, )
+    dataset = ADE20k(opt.batch_size, "./ADEChallengeData2016", train=True, shuffle=True)
     criterion = CriterionDSN()
     optimizer = nn.SGD(model.parameters(), opt.lr, 0.9, 0.0005)
     writer = SummaryWriter(opt.log_dir)
@@ -48,7 +48,7 @@ def train(opt):
         for batch_idx, (img, ann) in tqdm(enumerate(dataset)):
             out_m, out_aux = model(img)
             loss = criterion([out_m,out_aux],ann)
-            optimizer.lr = opt.lr * (max((1 - step / opt.iters), 1e-4) ** 0.9)
+            optimizer.lr = 1e-4 + ((opt.lr - 1e-4) * ((1 - step / opt.iters) ** 0.9))
             writer.add_scalar("loss", loss.numpy(), global_step=step)
             optimizer.step(loss)
             step += 1

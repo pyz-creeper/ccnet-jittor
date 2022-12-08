@@ -341,8 +341,8 @@ class Pipeline:
         if train: # train pipeline
             self.transforms = [
                 # NotRandomResize((512,512))
-                Resize(img_scale=(1024,512),ratio_range=(0.5,1.5))
-                ,RandomCrop(crop_size=(512,512),cat_max_ratio=0.8)
+                Resize(img_scale=(2048,512),ratio_range=(0.5,2.0))
+                ,RandomCrop(crop_size=(512,512),cat_max_ratio=0.75)
                 ,RandomFlip(prob=0.5)
                 ,PhotoMetricDistortion()
                 ,Normalize(mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375])
