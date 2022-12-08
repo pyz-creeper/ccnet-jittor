@@ -72,10 +72,11 @@ class DilatedCrissCrossAttention(nn.Module):
         B, C, H, W = x.shape
 
         # calculate dilated mask
-        h_mask = jt.full_like(x, jt.Var(float('-inf')))
-        h_mask = h_mask.reindex(h_mask.shape, ['i0', 'i1', 'i2', 'i3'], overflow_conditions=[f'i3%{self.dilated}==i1%{self.dilated}'], overflow_value=0) # dilated
-        w_mask = jt.full_like(x, jt.Var(float('-inf')))
+        h_mask = jt.full([B, W, H, H], jt.Var(float('-inf')))
+        h_mask = h_mask.reindex(h_mask.shape, ['i0', 'i1', 'i2', 'i3'], overflow_conditions=[f'i3%{self.dilated}==i2%{self.dilated}'], overflow_value=0) # dilated
+        w_mask = jt.full([B, H, W, W], jt.Var(float('-inf')))
         w_mask = w_mask.reindex(w_mask.shape, ['i0', 'i1', 'i2', 'i3'], overflow_conditions=[f'i3%{self.dilated}==i2%{self.dilated}'], overflow_value=0) # dilated
+
 
         query = self.query_conv(x)
         key = self.key_conv(x)
@@ -112,10 +113,10 @@ class NeighborhoodCrissCrossAttention(nn.Module):
         quarter_W = W // 4
 
         # calculate dilated mask
-        h_mask = jt.full_like(x, jt.Var(float('-inf')))
-        h_mask = h_mask.reindex(h_mask.shape, ['i0', 'i1', 'i2', 'i3'], overflow_conditions=[f'((i3-i1)%{H}+{H})%{H}<{quarter_H}', f'((i1-i3)%{H}+{H})%{H}<{quarter_H}'], overflow_value=0) # neighborhood
-        w_mask = jt.full_like(x, jt.Var(float('-inf')))
-        w_mask = w_mask.reindex(w_mask.shape, ['i0', 'i1', 'i2', 'i3'], overflow_conditions=[f'((i3-i2)%{W}+{W})%{W}<{quarter_W}', f'((i2-i3)%{W}+{W})%{W}<{quarter_W}'], overflow_value=0) # neighborhood
+        h_mask = jt.full([B, W, H, H], jt.Var(float('-inf')))
+        h_mask = h_mask.reindex(h_mask.shape, ['i0', 'i1', 'i2', 'i3'], overflow_conditions=[f'(i3-i2)<{quarter_H}&&(i3-i2)>=0'], overflow_value=0) # neighborhood
+        w_mask = jt.full([B, H, W, W], jt.Var(float('-inf')))
+        w_mask = w_mask.reindex(w_mask.shape, ['i0', 'i1', 'i2', 'i3'], overflow_conditions=[f'(i3-i2)<<{quarter_W}&&(i3-i2)>=0'], overflow_value=0) # neighborhood
 
         query = self.query_conv(x)
         key = self.key_conv(x)
