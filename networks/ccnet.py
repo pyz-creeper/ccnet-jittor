@@ -1,16 +1,21 @@
 import jittor as jt
 from jittor import nn
 from .util_module import ConvModule, Dropout2d
-from .cc_attention import CrissCrossAttention
+from .cc_attention import CrissCrossAttention, DilatedCrissCrossAttention, NeighborhoodCrissCrossAttention
 from .resnet import Resnet101
 
 
 class CCHead(nn.Module):
-    def __init__(self, in_index=-1, recurrence=2, in_channels=2048, channels=512, dropout_rate=0.1, num_classes=151): # 150 classes and a background
+    def __init__(self, in_index=-1, recurrence=2, attention_block="vanilla", in_channels=2048, channels=512, dropout_rate=0.1, num_classes=151): # 150 classes and a background
         self.in_index = in_index
         self.channels = channels
         self.recurrence = recurrence
-        self.cca = CrissCrossAttention(self.channels)
+        if attention_block == "dilated":
+            self.cca = DilatedCrissCrossAttention(self.channels, dilated=2)
+        elif attention_block == "neighborhood":
+            self.cca = NeighborhoodCrissCrossAttention(self.channels)
+        else:
+            self.cca = CrissCrossAttention(self.channels)
 
         # default convs num is 2
         self.convs = [
@@ -43,8 +48,6 @@ class CCHead(nn.Module):
         output = self.cls_seg(output)
         return output
 
-# TODO implement the auxiliary head!
-# Not very necessary though
 
 class AuxiliaryAttentionHead(nn.Module):
     def __init__(self, in_index=-2, in_channels=1024, channels=256, dropout_rate=0.1, num_classes=151):
@@ -63,9 +66,9 @@ class AuxiliaryAttentionHead(nn.Module):
 
 
 class CCnet(nn.Module):
-    def __init__(self) -> None:
+    def __init__(self, attention_block, recurrence) -> None:
         self.backbone = Resnet101(pretrained=True)
-        self.decoder = CCHead()
+        self.decoder = CCHead(attention_block=attention_block, recurrence=recurrence)
         self.aux_decoder = AuxiliaryAttentionHead()
 
     def execute(self,x):
@@ -75,5 +78,3 @@ class CCnet(nn.Module):
         output_aux = self.aux_decoder(output_features)
         output_aux = nn.resize(output_aux,x.shape[2:],mode="bilinear")
         return output_main,output_aux
-        
-        
