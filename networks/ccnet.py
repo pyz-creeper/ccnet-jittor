@@ -3,6 +3,7 @@ from jittor import nn
 from .util_module import ConvModule, Dropout2d
 from .cc_attention import CrissCrossAttention, DilatedCrissCrossAttention, NeighborhoodCrissCrossAttention
 from .resnet import Resnet101
+from .van import van_large,van_base
 
 
 class CCHead(nn.Module):
@@ -70,6 +71,20 @@ class CCnet(nn.Module):
         self.backbone = Resnet101(pretrained=True)
         self.decoder = CCHead(attention_block=attention_block, recurrence=recurrence)
         self.aux_decoder = AuxiliaryAttentionHead()
+
+    def execute(self,x):
+        output_features = self.backbone(x)
+        output_main = self.decoder(output_features)
+        output_main = nn.resize(output_main,x.shape[2:],mode="bilinear")
+        output_aux = self.aux_decoder(output_features)
+        output_aux = nn.resize(output_aux,x.shape[2:],mode="bilinear")
+        return output_main,output_aux
+
+class VAN_CCnet(nn.Module):
+    def __init__(self, attention_block, recurrence) -> None:
+        self.backbone = van_base(pretrained=True)
+        self.decoder = CCHead(in_channels=512,attention_block=attention_block, recurrence=recurrence)
+        self.aux_decoder = AuxiliaryAttentionHead(in_index=-1,in_channels=512)
 
     def execute(self,x):
         output_features = self.backbone(x)
