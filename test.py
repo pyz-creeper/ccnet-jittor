@@ -1,5 +1,5 @@
 import os
-# os.environ['CUDA_VISIBLE_DEVICES'] = '2'
+os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 
 import jittor
 jittor.flags.use_cuda = 1
@@ -13,8 +13,8 @@ import numpy as np
 
 
 if __name__ == "__main__":
-    model = CCnet()
-    model.load("./saves/1202_aux_16/train_ccnet_resnet_epoch80000.pkl")
+    model = CCnet(attention_block="vanilla", recurrence=2)
+    model.load("./saves/ckpts/1208_final_16_train_ccnet_resnet_epoch16000.pkl")
     test_single_gpu(model)
     # dataset = ADE20k(1,"./ADEChallengeData2016",train=False)
     # confusion_matrix = np.zeros((151,151))
