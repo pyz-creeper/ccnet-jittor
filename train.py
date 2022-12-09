@@ -22,7 +22,7 @@ from tensorboardX import SummaryWriter
 def parse_opt():
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("--lr", type=float, default="1e-2", help="learning rate")
+    parser.add_argument("--lr", type=float, default="2e-3", help="learning rate")
     parser.add_argument("--batch_size", type=int, default=16, help="batch size")
     parser.add_argument("--iters", type=int, default=80000, help="total train iterations")
     parser.add_argument("--save_every", type=int, default=8000, help="save gap")
