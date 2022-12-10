@@ -14,7 +14,7 @@ import numpy as np
 
 if __name__ == "__main__":
     model = CCnet(attention_block="vanilla", recurrence=2)
-    model.load("./saves/ckpts/1208_final_16_train_ccnet_resnet_epoch16000.pkl")
+    model.load("./saves/ckpts/1208_final_16_train_ccnet_resnet_epoch40000.pkl")
     test_single_gpu(model)
     # dataset = ADE20k(1,"./ADEChallengeData2016",train=False)
     # confusion_matrix = np.zeros((151,151))

@@ -417,7 +417,7 @@ def van_base(pretrained=False, **kwargs):
         **kwargs)
     model.default_cfg = _cfg()
     if pretrained:
-        model.load("./data.pkl")
+        model.load("./pretrain/van_base.pth")
 
     return model
 
