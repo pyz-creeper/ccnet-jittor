@@ -58,6 +58,9 @@ class ADE20k(Dataset):
         img_info = self.img_infos[self.shuffle_index[index]]
         ini_img = cv2.imread(img_info['img_dir'])
         ini_ann = cv2.imread(img_info['ann_dir'],cv2.IMREAD_GRAYSCALE)
+        ini_ann[ini_ann == 0] = 255
+        ini_ann -= 1
+        ini_ann[ini_ann == 254] = 255
 
         if self.is_train:
             # ver 1 control cuda memory #

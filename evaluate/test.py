@@ -42,7 +42,7 @@ def get_confusion_matrix(gt_label, pred_label, class_num):
                 confusion_matrix[i_label, i_pred_label] = label_count[cur_index]
     return confusion_matrix
 
-def test_single_gpu(model,class_num=151):
+def test_single_gpu(model,class_num=150):
     model.eval()
     dataset = ADE20k(1,"./ADEChallengeData2016",train=False, transform_pipeline=Pipeline(train=False)) # load val set!
     confusion_matrix = np.zeros((class_num,class_num))
