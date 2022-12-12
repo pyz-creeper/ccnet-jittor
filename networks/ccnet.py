@@ -7,7 +7,7 @@ from .van import van_large,van_base
 
 
 class CCHead(nn.Module):
-    def __init__(self, in_index=-1, recurrence=2, attention_block="vanilla", in_channels=2048, channels=512, dropout_rate=0.1, num_classes=151): # 150 classes and a background
+    def __init__(self, in_index=-1, recurrence=2, attention_block="vanilla", in_channels=2048, channels=512, dropout_rate=0.1, num_classes=150): # 150 classes and a background
         self.in_index = in_index
         self.channels = channels
         self.recurrence = recurrence
@@ -51,7 +51,7 @@ class CCHead(nn.Module):
 
 
 class AuxiliaryAttentionHead(nn.Module):
-    def __init__(self, in_index=-2, in_channels=1024, channels=256, dropout_rate=0.1, num_classes=151):
+    def __init__(self, in_index=-2, in_channels=1024, channels=256, dropout_rate=0.1, num_classes=150):
         self.in_index = in_index
         self.channels = channels
         self.convs = ConvModule(in_channel=in_channels,out_channel=channels,kernel_size=3,padding=1,dilation=1)
