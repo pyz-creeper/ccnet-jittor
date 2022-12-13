@@ -28,6 +28,6 @@ class Dropout2d(nn.Module):
     def execute(self,x):
         if self.is_training():
             mask = (jt.rand([1,x.shape[1],1,1]) > self.p).float()
-            return x * mask
+            return x * mask / (1 - self.p)
         else:
             return x
