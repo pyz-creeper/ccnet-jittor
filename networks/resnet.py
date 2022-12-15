@@ -12,6 +12,7 @@
 
 import jittor as jt
 from jittor import nn
+from .util_module import ConvModule
 
 __all__ = ['ResNet', 'Resnet18', 'Resnet34', 'Resnet26', 'Resnet38', 'Resnet50', 'Resnet101', 'Resnet152', 'Resnext50_32x4d', 'Resnext101_32x8d', 'Wide_resnet50_2', 'Wide_resnet101_2',
     'resnet18', 'resnet34', 'resnet26', 'resnet38', 'resnet50', 'resnet101', 'resnet152', 'resnext50_32x4d', 'resnext101_32x8d', 'wide_resnet50_2', 'wide_resnet101_2']
@@ -111,11 +112,23 @@ class ResNet(nn.Module):
         jt.init.relu_invariant_gauss_(self.conv1.weight, mode="fan_out")
         self.bn1 = norm_layer(self.inplanes)
         self.relu = nn.Relu()
-        self.maxpool = nn.Pool(kernel_size=3, stride=2, padding=1, op='maximum')
+        self.maxpool = nn.Pool(kernel_size=3, stride=2, padding=1,op='maximum')
         self.layer1 = self._make_layer(block, 64, layers[0])
         self.layer2 = self._make_layer(block, 128, layers[1], stride=2, dilate=replace_stride_with_dilation[0])
         self.layer3 = self._make_layer(block, 256, layers[2], stride=2, dilate=replace_stride_with_dilation[1])
         self.layer4 = self._make_layer(block, 512, layers[3], stride=4, dilate=replace_stride_with_dilation[2])
+        self.stem = nn.Sequential(
+            nn.Conv(in_channels=3,out_channels=32,kernel_size=3,stride=2,padding=1,bias=False),
+            nn.BatchNorm(32),
+            nn.ReLU(),
+            nn.Conv(in_channels=32,out_channels=32,kernel_size=3,stride=1,padding=1,bias=False),
+            nn.BatchNorm(32),
+            nn.ReLU(),
+            nn.Conv(in_channels=32,out_channels=64,kernel_size=3,stride=1,padding=1,bias=False),
+            nn.BatchNorm(64),
+            nn.ReLU(),
+        )
+        self.deep_stem = True
         # self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
         # self.fc = nn.Linear((512 * block.expansion), num_classes)
 
@@ -136,9 +149,12 @@ class ResNet(nn.Module):
         return nn.Sequential(*layers)
 
     def _forward_impl(self, x):
-        x = self.conv1(x)
-        x = self.bn1(x)
-        x = self.relu(x)
+        if not self.deep_stem:
+            x = self.conv1(x)
+            x = self.bn1(x)
+            x = self.relu(x)
+        else:
+            x = self.stem(x)
         x = self.maxpool(x)
         outs = []
         x = self.layer1(x)
@@ -201,7 +217,7 @@ def Resnet101(pretrained=False, **kwargs):
 
     """
     model = _resnet(Bottleneck, [3, 4, 23, 3], **kwargs)
-    if pretrained: model.load("jittorhub://resnet101.pkl")
+    if pretrained: model.load("./pretrain/resnet.pkl")
     return model
 resnet101 = Resnet101
 

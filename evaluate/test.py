@@ -34,7 +34,6 @@ def get_confusion_matrix(gt_label, pred_label, class_num):
     index = (gt_label * class_num + pred_label).astype('int32').reshape(-1)
     label_count = np.bincount(index)
     confusion_matrix = np.zeros((class_num, class_num))
-
     for i_label in range(class_num):
         for i_pred_label in range(class_num):
             cur_index = i_label * class_num + i_pred_label
@@ -50,7 +49,10 @@ def test_single_gpu(model,class_num=150):
         for index, (img, ann) in tqdm(enumerate(dataset)):
             ann = ann.numpy().astype(np.int32)
             output,_ = model(img)
-            seg_pred = np.asarray(np.argmax(output.numpy(), axis=1), dtype=np.int32)
+            seg_pred = np.array(output.argmax(dim=1)[0].numpy(), dtype=np.int32)
+            ignore = ann != 255
+            seg_pred = seg_pred[ignore]
+            ann = ann[ignore]
             confusion_matrix += get_confusion_matrix(ann, seg_pred, class_num)
             jt.sync_all()
             jt.gc()
@@ -58,6 +60,7 @@ def test_single_gpu(model,class_num=150):
         res = confusion_matrix.sum(0)
         tp = np.diag(confusion_matrix)
         IU_array = (tp / np.maximum(1.0, pos + res - tp))
+        print(IU_array)
         mean_IU = IU_array.mean()
         print("mean_IoU:",mean_IU)
 

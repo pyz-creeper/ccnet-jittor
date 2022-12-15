@@ -6,13 +6,13 @@ class ConvModule(nn.Module):
     conv - batchnorm - relu
     '''
     def __init__(self,in_channel,out_channel,kernel_size,padding,dilation) -> None:
-        self.conv = nn.Conv(in_channel,out_channel,kernel_size,padding=padding,dilation=dilation)
-        self.norm = nn.BatchNorm(out_channel)
+        self.conv = nn.Conv(in_channel,out_channel,kernel_size,padding=padding,dilation=dilation,bias=False)
+        self.bn = nn.BatchNorm(out_channel)
         self.activate = nn.Relu()
 
     def execute(self,x):
         x = self.conv(x)
-        x = self.norm(x)
+        x = self.bn(x)
         x = self.activate(x)
         return x
     
