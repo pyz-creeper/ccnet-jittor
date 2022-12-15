@@ -36,7 +36,7 @@ def parse_opt():
 
 
 def train(opt):
-    model = CCnet(opt.attention_block, opt.recurrence)
+    model = CCnet(opt.attention_block, opt.recurrence,pretrained=True)
     model.train()
     dataset = ADE20k(opt.batch_size, "./ADEChallengeData2016", train=True, shuffle=True)
     criterion = CriterionDSN()

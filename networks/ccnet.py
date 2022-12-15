@@ -19,10 +19,10 @@ class CCHead(nn.Module):
             self.cca = CrissCrossAttention(self.channels)
 
         # default convs num is 2
-        self.convs = [
+        self.convs = nn.ModuleList(
             ConvModule(in_channel=in_channels,out_channel=channels,kernel_size=3,padding=1,dilation=1),
             ConvModule(in_channel=channels,out_channel=channels,kernel_size=3,padding=1,dilation=1),
-            ]
+        )
         self.conv_cat = ConvModule(in_channel=in_channels+channels,out_channel=channels,kernel_size=3,padding=1,dilation=1)
 
         # used for cls_seg
@@ -54,7 +54,7 @@ class AuxiliaryAttentionHead(nn.Module):
     def __init__(self, in_index=-2, in_channels=1024, channels=256, dropout_rate=0.1, num_classes=150):
         self.in_index = in_index
         self.channels = channels
-        self.convs = ConvModule(in_channel=in_channels,out_channel=channels,kernel_size=3,padding=1,dilation=1)
+        self.convs = nn.ModuleList(ConvModule(in_channel=in_channels,out_channel=channels,kernel_size=3,padding=1,dilation=1))
         self.dropout = Dropout2d(p=dropout_rate)
         self.conv_seg = nn.Conv(channels,num_classes,kernel_size=1)
     
@@ -67,18 +67,33 @@ class AuxiliaryAttentionHead(nn.Module):
 
 
 class CCnet(nn.Module):
-    def __init__(self, attention_block, recurrence) -> None:
-        self.backbone = Resnet101(pretrained=True)
-        self.decoder = CCHead(attention_block=attention_block, recurrence=recurrence)
-        self.aux_decoder = AuxiliaryAttentionHead()
+    def __init__(self, attention_block, recurrence, pretrained) -> None:
+        self.backbone = Resnet101(pretrained=pretrained)
+        self.decode_head = CCHead(attention_block=attention_block, recurrence=recurrence)
+        self.auxiliary_head = AuxiliaryAttentionHead()
 
     def execute(self,x):
         output_features = self.backbone(x)
-        output_main = self.decoder(output_features)
+        output_main = self.decode_head(output_features)
         output_main = nn.resize(output_main,x.shape[2:],mode="bilinear")
-        output_aux = self.aux_decoder(output_features)
+        output_aux = self.auxiliary_head(output_features)
         output_aux = nn.resize(output_aux,x.shape[2:],mode="bilinear")
         return output_main,output_aux
+    
+    def test_encode_aux(self, input):
+        input = jt.array(input)
+        input = [input, input,input[:,:1024,:,:],input]
+        output_main = self.decode_head(input)
+        output_aux = self.auxiliary_head(input)
+        return output_main, output_aux
+    
+    def test_all_forward(self, input):
+        input = jt.array(input)
+        input = self.backbone(input)
+        out_decode = self.decode_head(input)
+        out_aux = self.auxiliary_head(input)
+        return out_decode, out_aux       
+        
 
 class VAN_CCnet(nn.Module):
     def __init__(self, attention_block, recurrence) -> None:
