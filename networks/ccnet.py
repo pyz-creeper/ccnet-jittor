@@ -96,8 +96,8 @@ class CCnet(nn.Module):
         
 
 class VAN_CCnet(nn.Module):
-    def __init__(self, attention_block, recurrence) -> None:
-        self.backbone = van_base(pretrained=True)
+    def __init__(self, attention_block, recurrence,pretrained) -> None:
+        self.backbone = van_base(pretrained=pretrained)
         self.decoder = CCHead(in_channels=512,attention_block=attention_block, recurrence=recurrence)
         self.aux_decoder = AuxiliaryAttentionHead(in_index=-1,in_channels=512)
 
