@@ -1,11 +1,11 @@
 import os
-os.environ['CUDA_VISIBLE_DEVICES'] = '1'
+os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
 import jittor
 jittor.flags.use_cuda = 1
 from datasets.dataloaders import ADE20k
 from networks.resnet import Resnet101
-from networks.ccnet import CCnet
+from networks.ccnet import CCnet, VAN_CCnet
 from evaluate.test import test_single_gpu,get_confusion_matrix
 from tqdm import tqdm
 import numpy as np
@@ -13,8 +13,9 @@ import numpy as np
 
 
 if __name__ == "__main__":
-    model = CCnet(attention_block="vanilla", recurrence=2,pretrained=False)
-    model.load("./saves/ckpts/1213_fixdropout_1e-2_16_train_ccnet_resnet_epoch8000.pkl")
+    # model = CCnet(attention_block="vanilla", recurrence=3, pretrained=False)
+    model = VAN_CCnet(attention_block="vanilla", recurrence=2, pretrained=False)
+    model.load("./saves/ckpts/1219_van_16_train_ccnet_resnet_epoch32000.pkl")
     test_single_gpu(model)
     # dataset = ADE20k(1,"./ADEChallengeData2016",train=False)
     # confusion_matrix = np.zeros((151,151))
