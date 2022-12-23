@@ -141,3 +141,6 @@ dmypy.json
 # files
 /saves
 *.pth
+
+# ADE20k
+ADEChallengeData2016/
