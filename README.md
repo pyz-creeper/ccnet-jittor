@@ -6,3 +6,5 @@ four things:
 - implement the train script (reference: mmseg tools/train.py)
 - implement the eval pipeline
 - compare with mmseg
+
+### speed test results

@@ -4,7 +4,7 @@ from PIL import Image
 import numpy as np
 import jittor
 jittor.flags.use_cuda = 1
-from networks.ccnet import CCnet, VAN_CCnet
+from networks.ccnet import get_model
 from datasets.data_pipeline import Pipeline
 from jittor.misc import make_grid
 
@@ -99,11 +99,7 @@ def show_result(imgs,gt_labels,pretrained_ckpt,backbone_type,save_dir):
     pretrained_ckpt: pkl file path for model to load
     backbone_type: VAN or Resnet
     '''
-    if backbone_type == "van":
-        model = VAN_CCnet(attention_block="vanilla", recurrence=2, pretrained=False)
-    else:
-        model = CCnet(attention_block="vanilla", recurrence=2, pretrained=False)
-    model.load(pretrained_ckpt)
+    model = get_model(backbone_type,pretrained_ckpt)
     datapipeline = Pipeline(train=False)
     for img_path,label_path in zip(imgs,gt_labels):
         img = cv2.imread(img_path)
