@@ -108,3 +108,11 @@ class VAN_CCnet(nn.Module):
         output_aux = self.aux_decoder(output_features)
         output_aux = nn.resize(output_aux,x.shape[2:],mode="bilinear")
         return output_main,output_aux
+    
+def get_model(backbone_type, pretrained_ckpt):
+    if backbone_type == "van":
+        model = VAN_CCnet(attention_block="vanilla", recurrence=2, pretrained=False)
+    else:
+        model = CCnet(attention_block="vanilla", recurrence=2, pretrained=False)
+    model.load(pretrained_ckpt)
+    return model

@@ -41,21 +41,29 @@ def get_confusion_matrix(gt_label, pred_label, class_num):
                 confusion_matrix[i_label, i_pred_label] = label_count[cur_index]
     return confusion_matrix
 
-def test_single_gpu(model,class_num=150):
+def test_single_gpu(model,class_num=150, scales=[1.0], flip=False):
     model.eval()
     dataset = ADE20k(1,"./ADEChallengeData2016",train=False, transform_pipeline=Pipeline(train=False)) # load val set!
     confusion_matrix = np.zeros((class_num,class_num))
     with jt.no_grad():
         for index, (img, ann) in tqdm(enumerate(dataset)):
             ann = ann.numpy().astype(np.int32)
-            output,_ = model(img)
-            seg_pred = np.array(output.argmax(dim=1)[0].numpy(), dtype=np.int32)
+            full_probs = jt.array(np.zeros([1,class_num,img.shape[-2],img.shape[-1]]))
+            for scale in scales:
+                img_zoomed = jt.nn.resize(img,(int(img.shape[-2]*scale),int(img.shape[-1]*scale)),mode="bilinear")
+                output, _ = model(img_zoomed)
+                if flip:
+                    flip_out, _ = model(img_zoomed[:,:,:,::-1])
+                    output = output * 0.5 + flip_out[:,:,:,::-1] * 0.5
+                output = jt.nn.resize(output,(img.shape[-2],img.shape[-1]),mode="bilinear")
+                full_probs += output
+                jt.sync_all()
+                jt.gc()
+            seg_pred = np.array(full_probs.argmax(dim=1)[0].numpy(), dtype=np.int32)
             ignore = ann != 255
             seg_pred = seg_pred[ignore]
             ann = ann[ignore]
             confusion_matrix += get_confusion_matrix(ann, seg_pred, class_num)
-            jt.sync_all()
-            jt.gc()
         pos = confusion_matrix.sum(1)
         res = confusion_matrix.sum(0)
         tp = np.diag(confusion_matrix)
