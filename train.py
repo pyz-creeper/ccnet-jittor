@@ -12,13 +12,6 @@ from tqdm import tqdm
 import time
 from tensorboardX import SummaryWriter
 
-# TODO: change this to a argparser format
-# learning_rate = 2e-3
-# batch_size = 16
-# global_step = 80000
-# eval_gap = 8000
-# save_every = 8000
-
 def parse_opt():
     parser = argparse.ArgumentParser()
 

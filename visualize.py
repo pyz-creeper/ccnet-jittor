@@ -7,6 +7,7 @@ jittor.flags.use_cuda = 1
 from networks.ccnet import get_model
 from datasets.data_pipeline import Pipeline
 from jittor.misc import make_grid
+import argparse
 
 CLASSES = (
     'wall', 'building', 'sky', 'floor', 'tree', 'ceiling', 'road', 'bed ',
@@ -73,6 +74,18 @@ PALETTE = [[120, 120, 120], [180, 120, 120], [6, 230, 230], [80, 50, 50],
             [184, 255, 0], [0, 133, 255], [255, 214, 0], [25, 194, 194],
             [102, 255, 0], [92, 0, 255]]
 
+def parse_opt():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--ckpt_dir", type=str, help="checkpoint directory")
+    parser.add_argument("--recurrence", type=int, default=2, help="cc attention recurrence")
+    parser.add_argument("--attention_block", type=str, default='vanilla',
+                        choices=['vanilla', 'neighborhood', 'dilated'], help="attention block type")
+    parser.add_argument("--model_backbone", type=str, default='resnet',
+                        choices=['resnet', 'van'], help="backbone")
+    parser.add_argument("--pic_dir",type=str , help="the directory of the picture")
+    parser.add_argument("--save_dir", type=str, help="the directory to save the result")
+    opt = parser.parse_args()
+    return opt
 
 def _show_result_np(result):
     '''
@@ -103,23 +116,25 @@ def show_result(imgs,gt_labels,pretrained_ckpt,backbone_type,save_dir):
     datapipeline = Pipeline(train=False)
     for img_path,label_path in zip(imgs,gt_labels):
         img = cv2.imread(img_path)
-        label = cv2.imread(label_path,cv2.IMREAD_GRAYSCALE)
+        # label = cv2.imread(label_path,cv2.IMREAD_GRAYSCALE)
         colored_result = inferece_result(model, img, datapipeline)
-        img = np.array(img)[:,:,::-1]
-        label = np.array(label)
-        label[label==0] = 1
-        label -= 1
-        colored_gt = _show_result_np(label)
+        # img = np.array(img)[:,:,::-1]
+        # label = np.array(label)
+        # label[label==0] = 1
+        # label -= 1
+        # colored_gt = _show_result_np(label)
         im_name = os.path.basename(img_path)
-        Image.fromarray((img).astype(np.uint8)).save(os.path.join(save_dir,"ori_"+im_name[:-3]+"png"))
-        Image.fromarray((colored_result).astype(np.uint8)).save(os.path.join(save_dir,"pre_"+im_name[:-3]+"png"))
+        # Image.fromarray((img).astype(np.uint8)).save(os.path.join(save_dir,"ori_"+im_name[:-3]+"png"))
+        # Image.fromarray((colored_result).astype(np.uint8)).save(os.path.join(save_dir,"pre_"+im_name[:-3]+"png"))
         Image.fromarray((colored_result/2+img/2).astype(np.uint8)).save(os.path.join(save_dir,"mix_"+im_name[:-3]+"png"))
-        Image.fromarray((colored_gt/2+img/2).astype(np.uint8)).save(os.path.join(save_dir,"gt_"+im_name[:-3]+"png"))
+        # Image.fromarray((colored_gt/2+img/2).astype(np.uint8)).save(os.path.join(save_dir,"gt_"+im_name[:-3]+"png"))
         # cv2.imwrite(os.path.join(save_dir,im_name),colored_result.astype(np.uint8))
         
 
 if __name__ == "__main__":
-    show_result(["./ADEChallengeData2016/images/validation/ADE_val_00000001.jpg"],
-                ["./ADEChallengeData2016/annotations/validation/ADE_val_00000001.png"],
-                "./saves/ckpts/1215_1e-2_16_train_ccnet_resnet_epoch80000.pkl",
-                "resnet","./tmp")
+    opt = parse_opt()
+    show_result([opt.pic_dir],
+                [None],
+                opt.ckpt_dir,
+                opt.model_backbone,
+                opt.save_dir)

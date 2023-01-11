@@ -18,8 +18,19 @@ mpirun -np 4 python train.py --log_dir <log directory>
 
 ### Testing
 
+To test a model, you can specify the model checkpoint directory and the model's backbone, and run:
+
+```
+python test.py --ckpt_dir <log directory> --model_backbone <van or resnet>
+```
 
 ### Inference
+
+To visualize a result, you can specify the picture's directory and the model, and run:
+
+```
+python visualize.py --ckpt_dir <log directory> --model_backbone <van or resnet> --pic_dir <picture directory> --save_dir <save directory>
+```
 
 ### Pretrained Checkpoints
 
